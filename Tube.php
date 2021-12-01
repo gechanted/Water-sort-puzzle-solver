@@ -96,11 +96,10 @@ class Tube
 
     public function hash(): string
     {
-        $hash = array_key_exists(0, $this->content) ? $this->content[0]->getColorNr() :' ';
-        $hash .= array_key_exists(1, $this->content) ? $this->content[1]->getColorNr() :' ';
-        $hash .= array_key_exists(2, $this->content) ? $this->content[2]->getColorNr() :' ';
-        $hash .= array_key_exists(3, $this->content) ? $this->content[3]->getColorNr() :' ';
-
+        $hash = $this->height;
+        foreach ($this->content as $color) {
+            $hash .= $color->getColorNr();
+        }
         return $hash;
     }
 

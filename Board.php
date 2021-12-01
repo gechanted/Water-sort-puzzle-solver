@@ -25,15 +25,13 @@ class Board
 
     public function isSolved(): bool
     {
-        $isSolved = true;
         foreach ($this->tubes as $tube) {
             if ($tube->isSolved() === false) {
-                $isSolved = false;
-                break;
+                return false;
             }
         }
 
-        return $isSolved;
+        return true;
     }
 
     public function solve(): bool
@@ -76,10 +74,8 @@ class Board
             return false;
         }
         self::$generalLog[] = $hash;
-        if ($this->solve()) {
-            return true;
-        }
-        return false;
+
+        return $this->solve();
     }
 
 

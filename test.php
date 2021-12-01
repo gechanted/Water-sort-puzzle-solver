@@ -7,11 +7,10 @@ require_once __DIR__ . '/PrintToTerminal.php';
 require_once __DIR__ . '/TerminalRow.php';
 
 function getFullTube(int $nr): Tube {
-    $tube = new Tube($nr);
-    $tube->addColor(new Color('bleach'));
-    $tube->addColor(new Color('bleach'));
-    $tube->addColor(new Color('bleach'));
-    $tube->addColor(new Color('bleach'));
+    $tube = new Tube($nr, 3);
+    $tube->addColor(new Color('eyebleach'));
+    $tube->addColor(new Color('eyebleach'));
+    $tube->addColor(new Color('eyebleach'));
     return $tube;
 }
 
@@ -20,17 +19,20 @@ $recorder = new ProgressRecorder();
 $tube1 = new Tube(1);
 $tube1->addColor(new Color('blue'));
 $tube1->addColor(new Color('blue'));
-$tube1->addColor(new Color('pink'));
+$tube1->addColor(new Color('blue'));
 $tube1->addColor(new Color('pink'));
 
-$tube2 = new Tube(2);
-$tube2->addColor(new Color('pink'));
+$tube2 = new Tube(2, 3);
 $tube2->addColor(new Color('pink'));
 $tube2->addColor(new Color('blue'));
 $tube2->addColor(new Color('blue'));
 
-$tube3 = new Tube(3);
-$tube4 = getFullTube(4);
+$tube3 = new Tube(3, 3);
+
+$tube4 = new Tube(4, 2);
+$tube4->addColor(new Color('blue'));
+$tube4->addColor(new Color('pink'));
+
 $tube5 = getFullTube(5);
 $tube6 = getFullTube(6);
 $tube7 = getFullTube(7);
@@ -41,13 +43,15 @@ $tube11 = getFullTube(11);
 $tube12 = getFullTube(12);
 $tube13 = getFullTube(13);
 $tube14 = getFullTube(14);
+$tube15 = getFullTube(15);
 
 $board = new Board([
-    $tube1, $tube2, $tube3, $tube4, $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13, $tube14
+    $tube1, $tube2, $tube3, $tube4
+//    , $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13, $tube14
 ], $recorder);
 
 var_dump($board->solve());
 
-$printer = new PrintToTerminal($recorder, 64);
+$printer = new PrintToTerminal($recorder, 8, 10);
 echo $printer->print();
 

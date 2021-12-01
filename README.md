@@ -43,7 +43,7 @@ $board = new Board([ //contains the tubes and solves the problem
 
 var_dump($board->solve()); //calculates the solution - gives back bool(false) if it's not solvable
 
-$printer = new PrintToTerminal($recorder, 96); //at 96 chars the line is broken into the next one
+$printer = new PrintToTerminal($recorder, 8); //at tubes the line is broken into the next one
 echo $printer->print(); //prints the solution
 ```
 
@@ -105,10 +105,7 @@ public function solve(): bool
         self::$generalLog[] = $hash;
         //this board was cloned and has now changed its content
         //start solving further (recursion call)
-        if ($this->solve()) {
-            return true;
-        }
-        return false;
+        return $this->solve();
     }
 ```
 
