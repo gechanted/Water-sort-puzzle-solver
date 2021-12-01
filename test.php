@@ -52,6 +52,6 @@ $board = new Board([
 
 var_dump($board->solve());
 
-$printer = new PrintToTerminal($recorder, 8, 10);
+$printer = new PrintToTerminal($recorder, 4, 10);
 echo $printer->print();
 

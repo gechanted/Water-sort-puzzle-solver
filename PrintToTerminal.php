@@ -28,16 +28,15 @@ class PrintToTerminal
     {
         $fancyLine =  '_-';
         $fancyLine .= str_repeat('_-', ceil($this->rowSize() / 2));
-        $line = '-';
-        $line .= str_repeat('-', $this->rowSize());
 
         $output = PHP_EOL . $fancyLine . PHP_EOL . PHP_EOL;
         foreach ($this->recorder->getBoardCollection() as $board) {
             $row = new TerminalRow([], false);
             foreach ($board->getTubes() as $tube) {
-                $row->addRow($this->tubeToRow($tube));
+                $row->addRow($this->renderTubeToRow($tube));
             }
 
+            //break the line into the next one
             do {
                 $newRow = null;
                 if ($this->showTubesPerRow !== null) {
@@ -47,8 +46,9 @@ class PrintToTerminal
                 $row = $newRow;
             } while ($newRow !== null && $newRow->isEmpty() === false);
 
+            //prevent drawing the last line (a line too much)
             if ($board->isSolved() === false) {
-                $output .= $line . PHP_EOL . PHP_EOL;
+                $output .= str_repeat('-', $this->rowSize()) . PHP_EOL . PHP_EOL;
             }
         }
 
@@ -57,7 +57,13 @@ class PrintToTerminal
         return $output;
     }
 
-    public function tubeToRow(Tube $tube): TerminalRow
+    /**
+     * @param Tube $tube
+     * @return TerminalRow
+     *
+     * tube is RENDERED into a Row
+     */
+    public function renderTubeToRow(Tube $tube): TerminalRow
     {
         $colors = array_reverse($tube->getContent());
         $height = $tube->getHeight();
