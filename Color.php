@@ -27,7 +27,8 @@ class Color
         $this->colorName = $colorShort;
         $this->colorNr = array_search($colorShort, self::$table);
         if ($this->colorNr === false) {
-            throw new RuntimeException("color does not exist");
+            self::$table[] = $colorShort;
+            $this->colorNr = array_search($colorShort, self::$table);
         }
     }
 

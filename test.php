@@ -4,13 +4,14 @@ require_once __DIR__ . '/Tube.php';
 require_once __DIR__ . '/Color.php';
 require_once __DIR__ . '/ProgressRecorder.php';
 require_once __DIR__ . '/PrintToTerminal.php';
+require_once __DIR__ . '/TerminalRow.php';
 
 function getFullTube(int $nr): Tube {
     $tube = new Tube($nr);
-    $tube->addColor(new Color('black'));
-    $tube->addColor(new Color('black'));
-    $tube->addColor(new Color('black'));
-    $tube->addColor(new Color('black'));
+    $tube->addColor(new Color('bleach'));
+    $tube->addColor(new Color('bleach'));
+    $tube->addColor(new Color('bleach'));
+    $tube->addColor(new Color('bleach'));
     return $tube;
 }
 
@@ -39,12 +40,14 @@ $tube10 = getFullTube(10);
 $tube11 = getFullTube(11);
 $tube12 = getFullTube(12);
 $tube13 = getFullTube(13);
+$tube14 = getFullTube(14);
 
 $board = new Board([
-    $tube1, $tube2, $tube3, $tube4, $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13
+    $tube1, $tube2, $tube3, $tube4, $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13, $tube14
 ], $recorder);
 
 var_dump($board->solve());
 
-$printer = new PrintToTerminal($recorder, 96);
+$printer = new PrintToTerminal($recorder, 64);
 echo $printer->print();
+

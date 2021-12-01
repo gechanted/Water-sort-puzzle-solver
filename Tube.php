@@ -130,4 +130,9 @@ class Tube
     {
         return $this->content;
     }
+
+    public function getHeight(): int
+    {
+        return $this->height;
+    }
 }

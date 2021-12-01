@@ -45,16 +45,13 @@ class Board
             return true;
         }
 
-        foreach ($this->tubes as $tube1) {
-            foreach ($this->tubes as $tube2) {
+        foreach ($this->tubes as $k1 => $tube1) {
+            foreach ($this->tubes as $k2 => $tube2) {
                 if ($tube1 !== $tube2) {
                     if ($tube2->canReceive($tube1->getExtractable())) {
                         //spawn new thread
                         $newBoard = $this->clone();
-                        $result = $newBoard->solvingMove(
-                            array_search($tube1, $this->tubes),
-                            array_search($tube2, $this->tubes)
-                        );
+                        $result = $newBoard->solvingMove($k1, $k2);
                         if ($result) {
                             $this->recorder->recordBoard($this);
                             return true;

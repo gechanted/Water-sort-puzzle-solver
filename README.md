@@ -3,15 +3,31 @@ https://play.google.com/store/search?q=water%20sort%20puzzle&c=apps&gl=DE
 This is the game I have on my phone  
 https://play.google.com/store/apps/details?id=com.gma.water.sort.puzzle&gl=DE
 
-read (and change or copy) the test.php for an example
+The Game works like this:   
+You have Tubes (Containers) with fluids (blocks) stored in them  
+as long as they don't overflow the Tube (Container)  
+The height is usually 4 (blocks high)  
+This program can solve various heights  
+A tube (Container) is considered done if:   
+ **- all fluids (blocks) are the same color**  
+ **- and if the tube (Container) can no longer take in fluids (blocks)**  
+ **- or tube (Container) is empty**  
+The game is solved if every Tube is done
 
 *I didn't exactly follow coding standards coding this project.  
 Please don't think I always code this way,  
-it was just more (code-)efficient to code it this way* 
+it was just more (code-)efficient to code it this way*
 
-
-how to set up:
+how to set up:  
+*read (and change or copy) the test.php for an example*
 ```php
+require_once __DIR__ . '/Board.php';
+require_once __DIR__ . '/Tube.php';
+require_once __DIR__ . '/Color.php';
+require_once __DIR__ . '/ProgressRecorder.php';
+require_once __DIR__ . '/PrintToTerminal.php';
+require_once __DIR__ . '/TerminalRow.php';
+
 $recorder = new ProgressRecorder(); //records the progress of solution
 
 $tube1 = new Tube(1);

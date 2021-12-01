@@ -33,7 +33,8 @@ class PrintToTerminal
                 }
                 $output .= $row->toString() . PHP_EOL;
                 $row = $newRow;
-            } while ($newRow !== null && $newRow->getFirst() !== '');
+            } while ($newRow !== null && $newRow->isEmpty() === false);
+
             if ($board->isSolved() === false) {
                 $output .= $line . PHP_EOL . PHP_EOL;
             }
@@ -47,18 +48,20 @@ class PrintToTerminal
     public function tubeToRow(Tube $tube): TerminalRow
     {
         $colors = $tube->getContent();
-        for ($i = 0; $i <= 3;$i++) {
-            if (array_key_exists($i, $colors) === false) {
-                $colors[$i] = new Color('');
-            }
+        $height = $tube->getHeight();
+        $contentHeight = count($colors);
+        $filler = $height - $contentHeight;
+
+        $rows = ['   '. $this->to4chars($tube->getNr()) . ' '];
+        for ($i = 0; $i < $filler; $i++) {
+            $rows[] = ' |    | ';
         }
-        return new TerminalRow(
-            ' |'. $this->to4chars($colors[3]->getColorName()) .'| ',
-            ' |'. $this->to4chars($colors[2]->getColorName()) .'| ',
-            ' |'. $this->to4chars($colors[1]->getColorName()) .'| ',
-            ' |'. $this->to4chars($colors[0]->getColorName()) .'| ',
-            ' +----+ '
-        );
+        foreach ($colors as $color) {
+            $rows[] = ' |'. $this->to4chars($color->getColorName()) .'| ';
+        }
+        $rows[] = ' +----+ ';
+
+        return new TerminalRow($rows);
     }
 
     private function to4chars(string $string): string
@@ -69,95 +72,5 @@ class PrintToTerminal
         } else {
             return substr($string, 0, 4);
         }
-    }
-}
-
-class TerminalRow
-{
-    private string $first;
-    private string $second;
-    private string $third;
-    private string $forth;
-    private string $fifth;
-
-    public function __construct(
-        string $first = '',
-        string $second = '',
-        string $third = '',
-        string $forth = '',
-        string $fifth = ''
-    )
-    {
-        $this->first = $first;
-        $this->second = $second;
-        $this->third = $third;
-        $this->forth = $forth;
-        $this->fifth = $fifth;
-    }
-
-    public function add(
-        string $first,
-        string $second,
-        string $third,
-        string $forth,
-        string $fifth
-    )
-    {
-        $this->first .= $first;
-        $this->second .= $second;
-        $this->third .= $third;
-        $this->forth .= $forth;
-        $this->fifth .= $fifth;
-    }
-
-    public function addRow(TerminalRow $row): void
-    {
-        $this->add(
-            $row->getFirst(),
-            $row->getSecond(),
-            $row->getThird(),
-            $row->getForth(),
-            $row->getFifth(),
-        );
-    }
-
-    public function split(int $splitPoint = 96): TerminalRow
-    {
-        return new TerminalRow(
-            $this->strsplit($this->first, $splitPoint),
-            $this->strsplit($this->second, $splitPoint),
-            $this->strsplit($this->third, $splitPoint),
-            $this->strsplit($this->forth, $splitPoint),
-            $this->strsplit($this->fifth, $splitPoint),
-        );
-    }
-
-    private function strsplit(string &$string, int $splitPoint): string
-    {
-        $cutoff = substr($string, $splitPoint);
-        $string = substr($string, 0, $splitPoint);
-        return $cutoff;
-    }
-
-//$tr = new TerminalRow();
-//$string = '1234567890-1234567890-1234567890';
-//$result = $tr->strsplit($string, 15);
-//
-//echo $string . $result . PHP_EOL;
-//var_dump($string, $result);}
-
-    public function getFirst(): string { return $this->first; }
-    public function getSecond(): string { return $this->second; }
-    public function getThird(): string { return $this->third; }
-    public function getForth(): string { return $this->forth; }
-    public function getFifth(): string { return $this->fifth; }
-
-    public function toString(): string
-    {
-        return $this->getFirst() . PHP_EOL
-            . $this->getSecond() . PHP_EOL
-            . $this->getThird() . PHP_EOL
-            . $this->getForth() . PHP_EOL
-            . $this->getFifth() . PHP_EOL;
     }
 }
