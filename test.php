@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/Board.php';
+require_once __DIR__ . '/BoardFactory.php';
 require_once __DIR__ . '/Tube.php';
 require_once __DIR__ . '/Color.php';
 require_once __DIR__ . '/ProgressRecorder.php';
 require_once __DIR__ . '/PrintToTerminal.php';
 require_once __DIR__ . '/TerminalRow.php';
+require_once __DIR__ . '/Timer.php';
 
 function getFullTube(int $nr): Tube {
     $tube = new Tube($nr, 3);
@@ -48,10 +50,10 @@ $tube15 = getFullTube(15);
 $board = new Board([
     $tube1, $tube2, $tube3, $tube4
 //    , $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13, $tube14
-], $recorder);
+], $recorder, 0, true, true);
 
 var_dump($board->solve());
 
-$printer = new PrintToTerminal($recorder, 4, 10);
-echo $printer->print();
+$printer = new PrintToTerminal( 4, 10);
+echo $printer->print($recorder);
 

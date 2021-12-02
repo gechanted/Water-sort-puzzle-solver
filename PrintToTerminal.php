@@ -3,13 +3,11 @@
 class PrintToTerminal
 {
 
-    private ProgressRecorder $recorder;
     private ?int $showTubesPerRow;
     private int $tubeTextLength;
 
-    public function __construct(ProgressRecorder $recorder, int $showTubesPerRow = null, int $tubeTextLength = 4)
+    public function __construct(int $showTubesPerRow = null, int $tubeTextLength = 4)
     {
-        $this->recorder = $recorder;
         $this->showTubesPerRow = $showTubesPerRow;
         $this->tubeTextLength = $tubeTextLength;
     }
@@ -24,17 +22,15 @@ class PrintToTerminal
         return $this->tubeSize() * $this->showTubesPerRow;
     }
 
-    public function print(): string
+    public function print(ProgressRecorder $recorder): string
     {
         $fancyLine =  '_-';
         $fancyLine .= str_repeat('_-', ceil($this->rowSize() / 2));
 
         $output = PHP_EOL . $fancyLine . PHP_EOL . PHP_EOL;
-        foreach ($this->recorder->getBoardCollection() as $board) {
-            $row = new TerminalRow([], false);
-            foreach ($board->getTubes() as $tube) {
-                $row->addRow($this->renderTubeToRow($tube));
-            }
+        foreach ($recorder->getBoardCollection() as $board) {
+            $output .= ' > Step ' . $board->getDeepness() . PHP_EOL;
+            $row = $this->printBoardToRow($board);
 
             //break the line into the next one
             do {
@@ -90,5 +86,18 @@ class PrintToTerminal
         } else {
             return substr($string, 0, $wishedStringLength);
         }
+    }
+
+    /**
+     * @param Board $board
+     * @return TerminalRow
+     */
+    public function printBoardToRow(Board $board): TerminalRow
+    {
+        $row = new TerminalRow([], false);
+        foreach ($board->getTubes() as $tube) {
+            $row->addRow($this->renderTubeToRow($tube));
+        }
+        return $row;
     }
 }

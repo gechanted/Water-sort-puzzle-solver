@@ -22,6 +22,10 @@ class Tube
 
     public function getExtractable(): array
     {
+        if ($this->isSolved()) {
+            return [];
+        }
+
         $returnArr = [];
         $color = null;
         for ($i = $this->height; $i >= 0; $i--) {
@@ -67,6 +71,9 @@ class Tube
      */
     public function canReceive(array $package): bool
     {
+        if ($package === []) {
+            return false;
+        }
         if (count($this->content) + count($package) > $this->height) {
             return false;
         }
@@ -74,6 +81,7 @@ class Tube
         for ($i = $this->height; $i >= 0; $i--) {
             if (array_key_exists($i, $this->content)) {
                 $thisTopColor = $this->content[$i];
+                break;
             }
         }
 

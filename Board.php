@@ -16,11 +16,18 @@ class Board
      * @var Tube[]
      */
     private array $tubes;
+    private int $deepness;
+    private bool $echoPath;
+    private bool $echoTime;
 
-    public function __construct(array $tubes, ProgressRecorder $recorder)
+    public function __construct(array $tubes, ProgressRecorder $recorder, int $deepness = 0,
+                                bool $echoPath = false, bool $echoTime = false)
     {
         $this->tubes = $tubes;
         $this->recorder = $recorder;
+        $this->deepness = $deepness;
+        $this->echoPath = $echoPath;
+        $this->echoTime = $echoTime;
     }
 
     public function isSolved(): bool
@@ -36,6 +43,7 @@ class Board
 
     public function solve(): bool
     {
+        if ($this->echoTime) { Timer::time(str_repeat('  ', $this->deepness)); }
         $isSolved = $this->isSolved();
 
         if ($isSolved) {
@@ -47,6 +55,7 @@ class Board
             foreach ($this->tubes as $k2 => $tube2) {
                 if ($tube1 !== $tube2) {
                     if ($tube2->canReceive($tube1->getExtractable())) {
+                        if ($this->echoPath) { echo str_repeat('  ', $this->deepness) . $tube1->getNr() . ' into ' . $tube2->getNr() . PHP_EOL;}
                         //spawn new thread
                         $newBoard = $this->clone();
                         $result = $newBoard->solvingMove($k1, $k2);
@@ -54,6 +63,7 @@ class Board
                             $this->recorder->recordBoard($this);
                             return true;
                         }
+
                     }
                 }
             }
@@ -75,7 +85,12 @@ class Board
         }
         self::$generalLog[] = $hash;
 
-        return $this->solve();
+        $result = $this->solve();
+        if ($result) {
+            return true;
+        }
+        if ($this->echoPath) { echo str_repeat('  ', $this->deepness) . ' <- fail' . PHP_EOL;}
+        return false;
     }
 
 
@@ -87,7 +102,8 @@ class Board
             $tubeArr[] = clone $tube;
         }
 
-        return new Board($tubeArr, $this->recorder);
+        return new Board($tubeArr, $this->recorder, $this->deepness +1,
+            $this->echoPath, $this->echoTime);
     }
 
     public function hash(): string
@@ -113,4 +129,13 @@ class Board
         return $this->tubes;
     }
 
+    public function getRecorder(): ProgressRecorder
+    {
+        return $this->recorder;
+    }
+
+    public function getDeepness(): int
+    {
+        return $this->deepness;
+    }
 }
