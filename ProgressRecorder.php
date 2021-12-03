@@ -7,19 +7,17 @@ class ProgressRecorder
      * @var Board[]
      */
     private array $boardCollection = [];
-    private bool $flippedForInput = true;
+    /** @var string[] */
+    private array $moveCollection = [];
 
     public function recordBoard(Board $board): void
     {
-        $this->flip(true);
         $this->boardCollection[] = $board;
     }
 
-    public function flip(bool $flipForInput): void
+    public function recordMove(string $move)
     {
-        if ($flipForInput !== $this->flippedForInput) {
-            $this->boardCollection = array_reverse($this->boardCollection);
-        }
+        $this->moveCollection[] = $move;
     }
 
     /**
@@ -27,7 +25,14 @@ class ProgressRecorder
      */
     public function getBoardCollection(): array
     {
-        $this->flip(false);
-        return $this->boardCollection;
+        return array_reverse($this->boardCollection);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMoveCollection(): array
+    {
+        return array_reverse($this->moveCollection);
     }
 }

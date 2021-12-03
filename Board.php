@@ -76,7 +76,8 @@ class Board
         $tube1 = $this->tubes[$tube1Index];
         $tube2 = $this->tubes[$tube2Index];
 
-        $tube2->doReceive($tube1->getExtractable());
+        $extract = $tube1->getExtractable();
+        $tube2->doReceive($extract);
         $tube1->doExtract();
 
         $hash = $this->hash();
@@ -87,6 +88,7 @@ class Board
 
         $result = $this->solve();
         if ($result) {
+            $this->recorder->recordMove($tube1->getNr() . ' -> ' . $extract[0]->getColorName() . ' -> ' . $tube2->getNr());
             return true;
         }
         if ($this->echoPath) { echo str_repeat('  ', $this->deepness) . ' <- fail' . PHP_EOL;}

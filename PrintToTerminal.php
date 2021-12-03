@@ -28,8 +28,11 @@ class PrintToTerminal
         $fancyLine .= str_repeat('_-', ceil($this->rowSize() / 2));
 
         $output = PHP_EOL . $fancyLine . PHP_EOL . PHP_EOL;
-        foreach ($recorder->getBoardCollection() as $board) {
-            $output .= ' > Step ' . $board->getDeepness() . PHP_EOL;
+        foreach ($recorder->getBoardCollection() as $key => $board) {
+            $move = array_key_exists($key-1, $recorder->getMoveCollection()) ? $recorder->getMoveCollection()[$key-1] : '';
+            $times = ($this->rowSize()-12) /2 -12;
+            $centering = str_repeat(' ', max($times, 3));
+            $output .= ' > Step ' . $board->getDeepness() . $centering . $move . PHP_EOL;
             $row = $this->printBoardToRow($board);
 
             //break the line into the next one

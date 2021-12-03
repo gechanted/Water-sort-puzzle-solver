@@ -19,7 +19,9 @@ class Tube
         $this->content[] = $color;
     }
 
-
+    /**
+     * @return Color[]
+     */
     public function getExtractable(): array
     {
         if ($this->isSolved()) {
