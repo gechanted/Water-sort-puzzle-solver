@@ -41,18 +41,21 @@ $board = new Board([ //contains the tubes and solves the problem
     $tube1, $tube2, $tube3, $tube4, $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13
 ], $recorder);// is passed and filled by reference- I know that could be better
 
-var_dump($board->solve()); //calculates the solution - gives back bool(false) if it's not solvable
+var_dump($board->solve($recorder)); //calculates the solution - gives back bool(false) if it's not solvable
 
-$printer = new PrintToTerminal($recorder, 8); //at tubes the line is broken into the next one
+$printer = new PrintToTerminal(8); //at 8 tubes the line is broken into the next one
 echo $printer->print(); //prints the solution
 ```
 
 
 example output:
-````bool(true)
+````
+bool(true)
+
 
 _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
+ > Step 0          
        1                                                
  |   pink   |        2             3                    
  |   blue   |  |   blue   |  |          |        4      
@@ -61,6 +64,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  +----------+  +----------+  +----------+  +----------+ 
 --------------------------------------------------------
 
+ > Step 1          1 -> pink -> 3
        1                                                
  |          |        2             3                    
  |   blue   |  |   blue   |  |          |        4      
@@ -69,6 +73,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  +----------+  +----------+  +----------+  +----------+ 
 --------------------------------------------------------
 
+ > Step 2          4 -> pink -> 3
        1                                                
  |          |        2             3                    
  |   blue   |  |   blue   |  |          |        4      
@@ -77,6 +82,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  +----------+  +----------+  +----------+  +----------+ 
 --------------------------------------------------------
 
+ > Step 3          4 -> blue -> 1
        1                                                
  |   blue   |        2             3                    
  |   blue   |  |   blue   |  |          |        4      
@@ -85,6 +91,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  +----------+  +----------+  +----------+  +----------+ 
 --------------------------------------------------------
 
+ > Step 4          2 -> blue -> 4
        1                                                
  |   blue   |        2             3                    
  |   blue   |  |          |  |          |        4      
@@ -93,6 +100,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  +----------+  +----------+  +----------+  +----------+ 
 --------------------------------------------------------
 
+ > Step 5          2 -> pink -> 3
        1                                                
  |   blue   |        2             3                    
  |   blue   |  |          |  |   pink   |        4      
@@ -100,6 +108,8 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
  |   blue   |  |          |  |   pink   |  |   blue   | 
  +----------+  +----------+  +----------+  +----------+ 
 _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+Process finished with exit code 0
+
 ````
 
 
@@ -107,7 +117,7 @@ _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 *from Board.php*  
 The exact solving process:
 ```php
-public function solve(): bool
+    public function solve(): bool
     {
         //detect completion
         $isSolved = $this->isSolved();
@@ -116,20 +126,16 @@ public function solve(): bool
             $this->recorder->recordBoard($this);
             return true;
         }
-
+        
         //calculate the possible moves 
-        foreach ($this->tubes as $tube1) {
-            foreach ($this->tubes as $tube2) {
+        foreach ($this->tubes as $k1 => $tube1) {
+            foreach ($this->tubes as $k2 => $tube2) {
                 if ($tube1 !== $tube2) { //prevent putting sth from itself to itself
                     if ($tube2->canReceive($tube1->getExtractable())) {
-                        //if there is a possible move
-                        //do it and
-                        ////spawn new thread  //, to not change this board
+                        //if there is a possible move: do it
+                        //in a new thread, to not change this board
                         $newBoard = $this->clone();
-                        $result = $newBoard->solvingMove(
-                            array_search($tube1, $this->tubes),
-                            array_search($tube2, $this->tubes)
-                        );
+                        $result = $newBoard->solvingMove($k1, $k2);
                         //if the solution is correct 
                         if ($result) {
                             //log this part in the solving process
@@ -137,6 +143,7 @@ public function solve(): bool
                             //and pass on the good news
                             return true;
                         }
+
                     }
                 }
             }
@@ -149,18 +156,28 @@ public function solve(): bool
         $tube1 = $this->tubes[$tube1Index];
         $tube2 = $this->tubes[$tube2Index];
 
-        $tube2->doReceive($tube1->getExtractable());
+        $extract = $tube1->getExtractable();
+        $tube2->doReceive($extract);
         $tube1->doExtract();
 
         //make a short identifier for this board constellation
         //to ensure no infinite loops (and better calculation times)
-        $hash = $this->hash(); 
+        $hash = $this->hash();
         if (array_search($hash, self::$generalLog)) {
             return false;
         }
         self::$generalLog[] = $hash;
+
         //this board was cloned and has now changed its content
         //start solving further (recursion call)
-        return $this->solve();
+        $result = $this->solve();
+        //if the solution is correct 
+        if ($result) {
+            //log this part in the solving process
+            //I know here shouldn't be any text generation, but it's for the time being easier this way
+            $this->recorder->recordMove($tube1->getNr() . ' -> ' . $extract[0]->getColorName() . ' -> ' . $tube2->getNr());
+            return true;
+        }
+        return false;
     }
 ```

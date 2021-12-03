@@ -44,6 +44,7 @@ class Board
     public function solve(): bool
     {
         if ($this->echoTime) { Timer::time(str_repeat('  ', $this->deepness)); }
+        //detect completion
         $isSolved = $this->isSolved();
 
         if ($isSolved) {
@@ -51,16 +52,21 @@ class Board
             return true;
         }
 
+        //calculate the possible moves
         foreach ($this->tubes as $k1 => $tube1) {
             foreach ($this->tubes as $k2 => $tube2) {
-                if ($tube1 !== $tube2) {
+                if ($tube1 !== $tube2) { //prevent putting sth from itself to itself
                     if ($tube2->canReceive($tube1->getExtractable())) {
                         if ($this->echoPath) { echo str_repeat('  ', $this->deepness) . $tube1->getNr() . ' into ' . $tube2->getNr() . PHP_EOL;}
-                        //spawn new thread
+                        //if there is a possible move: do it
+                        //in a new thread, to not change this board
                         $newBoard = $this->clone();
                         $result = $newBoard->solvingMove($k1, $k2);
+                        //if the solution is correct
                         if ($result) {
+                            //log this part in the solving process
                             $this->recorder->recordBoard($this);
+                            //and pass on the good news
                             return true;
                         }
 
@@ -80,14 +86,21 @@ class Board
         $tube2->doReceive($extract);
         $tube1->doExtract();
 
+        //make a short identifier for this board constellation
+        //to ensure no infinite loops (and better calculation times)
         $hash = $this->hash();
         if (array_search($hash, self::$generalLog)) {
             return false;
         }
         self::$generalLog[] = $hash;
 
+        //this board was cloned and has now changed its content
+        //start solving further (recursion call)
         $result = $this->solve();
+        //if the solution is correct
         if ($result) {
+            //log this part in the solving process
+            //I know here shouldn't be any text generation, but it's for the time being easier this way
             $this->recorder->recordMove($tube1->getNr() . ' -> ' . $extract[0]->getColorName() . ' -> ' . $tube2->getNr());
             return true;
         }
