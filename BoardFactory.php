@@ -22,6 +22,6 @@ class BoardFactory
 
     public function createBoard(bool $echoPath = false, bool $echoTime = false): Board
     {
-        return new Board($this->tubes, new ProgressRecorder(), 0, $echoPath, $echoTime);
+        return new Board($this->tubes, new ProgressRecorder(), 0, null, $echoPath, $echoTime);
     }
 }

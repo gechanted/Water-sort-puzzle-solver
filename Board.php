@@ -5,11 +5,8 @@ require_once __DIR__ . '/ProgressRecorder.php';
 class Board
 {
 
-    /**
-     * @var string[]
-     */
-    private static array $generalLog = [];
 
+    private HashLog $generalLog;
     private ProgressRecorder $recorder;
 
     /**
@@ -20,7 +17,15 @@ class Board
     private bool $echoPath;
     private bool $echoTime;
 
-    public function __construct(array $tubes, ProgressRecorder $recorder, int $deepness = 0,
+    /**
+     * @param Tube[] $tubes
+     * @param ProgressRecorder $recorder
+     * @param int $deepness
+     * @param HashLog|null $generalLog
+     * @param bool $echoPath
+     * @param bool $echoTime
+     */
+    public function __construct(array $tubes, ProgressRecorder $recorder, int $deepness = 0, HashLog $generalLog = null,
                                 bool $echoPath = false, bool $echoTime = false)
     {
         $this->tubes = $tubes;
@@ -28,6 +33,7 @@ class Board
         $this->deepness = $deepness;
         $this->echoPath = $echoPath;
         $this->echoTime = $echoTime;
+        $this->generalLog = $generalLog ?: new HashLog();
     }
 
     public function isSolved(): bool
@@ -89,10 +95,10 @@ class Board
         //make a short identifier for this board constellation
         //to ensure no infinite loops (and better calculation times)
         $hash = $this->hash();
-        if (array_search($hash, self::$generalLog)) {
+        if ($this->generalLog->search($hash)) {
             return false;
         }
-        self::$generalLog[] = $hash;
+        $this->generalLog->add($hash);
 
         //this board was cloned and has now changed its content
         //start solving further (recursion call)
@@ -110,14 +116,17 @@ class Board
 
 
 
-    public function clone(): Board
+    public function clone(bool $newSubObjects = false): Board
     {
         $tubeArr = [];
         foreach ($this->tubes as $tube) {
             $tubeArr[] = clone $tube;
         }
 
-        return new Board($tubeArr, $this->recorder, $this->deepness +1,
+        return new Board($tubeArr,
+            $newSubObjects ? new ProgressRecorder() : $this->recorder,
+            $newSubObjects ? $this->deepness : $this->deepness +1,
+            $newSubObjects ? new HashLog() : $this->generalLog,
             $this->echoPath, $this->echoTime);
     }
 

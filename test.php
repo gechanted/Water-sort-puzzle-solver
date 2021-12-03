@@ -7,6 +7,7 @@ require_once __DIR__ . '/ProgressRecorder.php';
 require_once __DIR__ . '/PrintToTerminal.php';
 require_once __DIR__ . '/TerminalRow.php';
 require_once __DIR__ . '/Timer.php';
+require_once __DIR__ . '/HashLog.php';
 
 function getFullTube(int $nr): Tube {
     $tube = new Tube($nr, 3);

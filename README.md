@@ -22,11 +22,14 @@ how to set up:
 *read (and change or copy) the test.php for an example*
 ```php
 require_once __DIR__ . '/Board.php';
+require_once __DIR__ . '/BoardFactory.php';
 require_once __DIR__ . '/Tube.php';
+require_once __DIR__ . '/HashLog.php';
 require_once __DIR__ . '/Color.php';
 require_once __DIR__ . '/ProgressRecorder.php';
 require_once __DIR__ . '/PrintToTerminal.php';
 require_once __DIR__ . '/TerminalRow.php';
+require_once __DIR__ . '/Timer.php';
 
 $recorder = new ProgressRecorder(); //records the progress of solution
 
@@ -40,6 +43,9 @@ $tube1->addColor(new Color('pink'));
 $board = new Board([ //contains the tubes and solves the problem
     $tube1, $tube2, $tube3, $tube4, $tube5, $tube6, $tube7, $tube8, $tube9, $tube10, $tube11, $tube12, $tube13
 ], $recorder);// is passed and filled by reference- I know that could be better
+
+//I also have a BoardFactory, which streamlines this process
+//see test2.php for further information 
 
 var_dump($board->solve($recorder)); //calculates the solution - gives back bool(false) if it's not solvable
 
@@ -113,7 +119,6 @@ Process finished with exit code 0
 ````
 
 
-
 *from Board.php*  
 The exact solving process:
 ```php
@@ -180,4 +185,21 @@ The exact solving process:
         }
         return false;
     }
+```
+
+Since I had some spare time I rebuild the actual game in commandline: 
+see startGame.php as an example
+```php
+$boardFactory = new BoardFactory();
+$boardFactory
+    ->addTube(['red', 'yellow', 'lightgreen', 'darkgreen'])
+    ->addTube(['red', 'yellow', 'lightgreen', 'darkgreen'])
+    ->addTube(['red', 'yellow', 'lightgreen', 'darkgreen'])
+    ->addTube(['red', 'yellow', 'lightgreen', 'darkgreen'])
+    ->addTube([])
+    ->addTube([]);
+
+$board = $boardFactory->createBoard();
+$game = new Game($board, new PrintToTerminal(6,10));
+$game->main();
 ```

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/Board.php';
+require_once __DIR__ . '/HashLog.php';
 require_once __DIR__ . '/BoardFactory.php';
 require_once __DIR__ . '/Tube.php';
 require_once __DIR__ . '/Color.php';
